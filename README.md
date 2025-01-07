@@ -1,8 +1,9 @@
 # Mahmoud-Mourad-Dev-Web3eg-Smart-Contract-Auditor-Randomness-Vulnerabilities
-
-
 ```mermaid
 mindmap
-    id[I am a square]
-
+    Root
+        A
+        ::icon(fa fa-book)
+        B(B)
+        ::icon(mdi mdi-skull-outline)
 ```
