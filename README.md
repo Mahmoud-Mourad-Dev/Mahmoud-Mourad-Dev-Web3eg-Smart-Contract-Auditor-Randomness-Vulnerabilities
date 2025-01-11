@@ -167,6 +167,9 @@ Encountered 1 failing test in test/Games.t.sol:CounterTest
 
 Encountered a total of 1 failing tests, 0 tests succeeded
 ```
+- Why block.difficulty Is Deprecated
+
+
 
 
 
