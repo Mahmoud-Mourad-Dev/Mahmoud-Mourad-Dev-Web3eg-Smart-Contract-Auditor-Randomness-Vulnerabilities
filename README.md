@@ -168,9 +168,11 @@ Encountered 1 failing test in test/Games.t.sol:CounterTest
 Encountered a total of 1 failing tests, 0 tests succeeded
 ```
 - Why block.difficulty Is Deprecated
+  
   ![Static Badge](https://img.shields.io/badge/Example1-Green)
 
-- Games try to hack
+- Games ``` try to hack ```
+- 
 ```solidity
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.0;
@@ -190,8 +192,11 @@ contract Games {
 }
 ```
 Deploy this contract on sepolia
+
 ``` forge create src/Games.sol:Games --rpc-url $RPC_URL_SEPOLIA  --private-key $PRIVATE_KEY_MAHMOUD --value 0.01ether --broadcast ```
+
 OUTPUT
+
 ```
 [⠃] Compiling...
 No files changed, compilation skipped
@@ -199,7 +204,9 @@ Deployer: 0x5703A0101Fe9c462d33DE5Dd81a8C6e4fE391D3F
 Deployed to: 0x156aeD9f0Cf08Fa0f72E8a06808ffa2817F96A13
 Transaction hash: 0xadf2a1dae3134b47cd561fa0a91179d37d4241f4707ed5cf18df2ae588cb7244
 ```
+
 Contract To Attack
+
 ```solidity
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.0;
