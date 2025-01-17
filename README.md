@@ -299,6 +299,68 @@ Transactions saved to: /home/mourad/RandomnessVulnerabilities/games/broadcast/De
 Sensitive values saved to: /home/mourad/RandomnessVulnerabilities/games/cache/DeployAttacker.s.sol/11155111/run-latest.json
 ```
 
+![Static Badge](https://img.shields.io/badge/Example2-Green)
+
+- Lottery Contract Buy-ticket 
+```solidity
+ // SPDX-License-Identifier: UNLICENSED
+pragma solidity ^0.8.0;
+
+contract Lottery {
+
+ address public owner;
+ address [] public players;
+
+ constructor(){
+     owner = msg.sender;
+     }
+
+
+    function buyTicket () public payable{
+        require(msg.value == 1 ether ,"You need to send 1 ether");
+        players.push(msg.sender);
+    }
+
+    function picWinner() public{
+        require (msg.sender == owner, "You are not the owner");
+        require(players.length > 0 ,"No players in the game");
+        uint index = uint (keccak256(abi.encodePacked(block.difficulty,block.timestamp,block.number,msg.sender)));
+        address winner = players[index];
+        payable(winner).transfer(address(this).balance);
+        players = new address[] (0);
+    }
+}
+```
+- Script to deploy and broad cast
+```solidity 
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity ^0.8.0;
+
+import "forge-std/Script.sol";
+import "../src/Lottery.sol";
+
+contract DeployLottery is Script {
+
+    Lottery public lottery ;
+
+    function run () public{
+        vm.startBroadcast();
+        lottery = new Lottery();
+        console.log("Lottery deployed to:", address(lottery));
+        
+        vm.stopBroadcast();
+    }
+    
+}
+```
+- Command Line To Deploy
+``` forge script script/DeployLottery.s.sol:DeployLottery --rpc-url http://127.0.0.1:8545 --private-key <PRIVATE KEY> --broadcast ```
+- Buy Ticket from another contract 
+``` cast send <CONTRACT DEPLOYED ADDRESS> "buyTicket()" --rpc-url http://127.0.0.1:8545 --private-key <PRIVATE KEY> --value 1ether ```
+- To Check Balance 
+```cast balance < CONTRACT ADDRESS> --rpc-url http://127.0.0.1:8545 ```
+
+
 
 
 
