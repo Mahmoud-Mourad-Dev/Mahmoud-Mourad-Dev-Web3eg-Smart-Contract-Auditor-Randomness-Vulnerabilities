@@ -168,8 +168,8 @@ Encountered 1 failing test in test/Games.t.sol:CounterTest
 Encountered a total of 1 failing tests, 0 tests succeeded
 ```
 - Why block.difficulty Is Deprecated
-  
-  ![Static Badge](https://img.shields.io/badge/Example1-Green)
+
+   ![Static Badge](https://img.shields.io/badge/Example1-Green)
 
 - Games ``` try to hack ```
   
@@ -359,8 +359,73 @@ contract DeployLottery is Script {
 ``` cast send <CONTRACT DEPLOYED ADDRESS> "buyTicket()" --rpc-url http://127.0.0.1:8545 --private-key <PRIVATE KEY> --value 1ether ```
 - To Check Balance 
 ```cast balance < CONTRACT ADDRESS> --rpc-url http://127.0.0.1:8545 ```
+- explain "panic: array out-of-bounds access (0x32)" 
+- Write script to test Lottery
+```solidity
 
 
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity ^0.8.0;
+
+import "forge-std/Test.sol";
+import "src/Lottery.sol";
+
+contract TestLottery is Test {
+
+    Lottery public lottery ;
+
+    function setUp() public {
+        lottery = new Lottery();
+    }
+
+    function testOwner() public view {
+        assertEq(lottery.owner(), address(this));
+    }
+
+    function testBuyTicket () public{
+
+        address player1 = address(0x1);
+        address player2 = address(0x2);
+        address player3 = address(0x3);
+        vm.deal(player1, 1 ether);
+        vm.deal(player2, 1 ether);
+        vm.deal(player3, 1 ether);
+        vm.prank(player1);  
+        lottery.buyTicket{value : 1 ether}();
+        assertEq(lottery.players(0), player1);
+        vm.stopPrank();
+        vm.prank(player2);
+        lottery.buyTicket{value : 1 ether}();
+        assertEq(lottery.players(1), player2);
+        vm.stopPrank();
+        vm.prank(player3);
+        lottery.buyTicket{value : 1 ether}();
+        assertEq(lottery.players(2), player3);  
+        vm.stopPrank();
+    }
+
+    function testPickWinner() public{
+        address player1 = address(0x1);
+        address player2 = address(0x2);
+        address player3 = address(0x3);
+
+        vm.prank(player1);
+        vm.deal(player1, 2 ether);
+        lottery.buyTicket{value : 1 ether}();
+        vm.prank(player2);
+        vm.deal(player2, 2 ether);
+        lottery.buyTicket{value : 1 ether}();
+        vm.prank(player3);
+        vm.deal(player3, 2 ether);
+        lottery.buyTicket{value : 1 ether}();
+        vm.stopPrank();
+        vm.prank(address(this));
+        lottery.picWinner();
+        assertEq(lottery.getNumberOfPlayers(), 0);
+        assertEq(address(lottery).balance,0 ether);
+    }
+}
+```
 
 
 
